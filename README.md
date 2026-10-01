@@ -1,4 +1,4 @@
-# 🃏 Slay the Spire Clone - Edição JRPG 16-bits
+# 🃏 Deckbuilder Roguelike - Edição JRPG 16-bits
 
 Um protótipo completo de jogo de cartas roguelike inspirado em "Slay the Spire", reimaginado com uma charmosa estética retro de JRPGs 16-bits (estilo Chrono Trigger, Pokémon Emerald e Final Fantasy). 
 
