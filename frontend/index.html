@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slay the Spire Clone</title>
+    <link rel="stylesheet" href="style.css?v=3">
+</head>
+<body>
+    <div id="game-container">
+        
+        <!-- Tela Inicial -->
+        <div id="start-screen" class="screen">
+            <h1>Roguelike Deckbuilder</h1>
+            <p>Conquiste a torre e derrote os inimigos!</p>
+            <p id="high-score-display" style="font-size: 1.4rem; color: #f39c12; margin-bottom: 30px; font-weight: bold;"></p>
+            <button id="new-run-btn" class="main-btn">Nova Run</button>
+        </div>
+
+        <!-- Tela de Batalha -->
+        <div id="battle-screen" class="screen" style="display: none; flex-direction: column;">
+            
+            <!-- Mostrador do Andar -->
+            <div id="floor-display" class="jrpg-box">
+                Andar 1
+            </div>
+
+            <!-- Barra Superior: HPs -->
+            <header id="top-bar">
+                <div class="entity-status jrpg-box" id="player-status">
+                    <span class="name">Jogador</span>
+                    <div class="hp-bar-container">
+                        <div class="hp-bar" id="player-hp-bar" style="width: 100%;"></div>
+                        <span class="hp-text" id="player-hp-text">80/80</span>
+                    </div>
+                    <div id="potion-belt" class="potion-belt"></div>
+                    <div class="block-bubble" id="player-block" style="display: none;">🛡️ <span id="player-block-val">0</span></div>
+                </div>
+
+                <div class="entity-status jrpg-box" id="enemy-status">
+                    <span class="name">Inimigo</span>
+                    <div class="hp-bar-container">
+                        <div class="hp-bar enemy" id="enemy-hp-bar" style="width: 100%;"></div>
+                        <span class="hp-text" id="enemy-hp-text">50/50</span>
+                    </div>
+                    <div class="block-bubble" id="enemy-block" style="display: none;">🛡️ <span id="enemy-block-val">0</span></div>
+                </div>
+            </header>
+
+            <!-- Área Central: Batalha -->
+            <main id="battle-area">
+                <div class="entity" id="player-entity">
+                    <div class="sprite player-sprite" id="player-sprite"></div>
+                </div>
+                
+                <button id="end-turn-btn" class="main-btn jrpg-box">Passar</button>
+                
+                <div class="entity" id="enemy-entity">
+                    <div class="intent-bubble jrpg-box" id="enemy-intent">⚔️ 10</div>
+                    <div class="sprite enemy-sprite" id="enemy-sprite"></div>
+                </div>
+            </main>
+
+            <!-- Área Inferior: Cartas e Energia -->
+            <footer id="bottom-bar" class="jrpg-box">
+                <div id="energy-bubble">
+                    <div id="energy-bubble-text-wrapper">
+                        <span id="energy-text">3/3</span>
+                        <small>MANA</small>
+                    </div>
+                </div>
+                
+                <div id="hand-container">
+                </div>
+                
+                <div id="deck-piles">
+                    <div class="pile jrpg-box" id="draw-pile">Cards<br><span id="draw-count">0</span></div>
+                    <div class="pile jrpg-box" id="discard-pile">Discard<br><span id="discard-count">0</span></div>
+                </div>
+            </footer>
+        </div>
+
+        <!-- Tela de Saque (Loot) -->
+        <div id="loot-screen" class="screen" style="display: none;">
+            <h1>Recompensa</h1>
+            <p>Escolha uma carta para adicionar ao seu baralho:</p>
+            <div id="loot-cards-container"></div>
+            <button id="skip-loot-btn" class="main-btn">Pular</button>
+        </div>
+
+        <!-- Tela de Fim de Jogo -->
+        <div id="end-screen" class="screen" style="display: none;">
+            <h1 id="end-title">Game Over</h1>
+            <p id="end-message">Você foi derrotado na masmorra.</p>
+            <button id="return-start-btn" class="main-btn">Voltar ao Início</button>
+        </div>
+
+    </div>
+    
+    <!-- Scripts -->
+    <script src="js/apiClient.js?v=9"></script>
+    <script src="js/vfxManager.js?v=9"></script>
+    <script src="js/uiManager.js?v=9"></script>
+    <script src="js/main.js?v=9"></script>
+    
+    <script>
+        // Inicia o efeito de partículas assim que a página carregar
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.vfxManager) {
+                vfxManager.spawnLeaves('battle-area');
+            }
+        });
+    </script>
+</body>
+</html>
+
+

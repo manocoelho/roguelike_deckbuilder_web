@@ -1,0 +1,508 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+:root {
+    --jrpg-bg: #08142b; /* Azul escuro classico Final Fantasy/Chrono */
+    --jrpg-border: #ecf0f1;
+    --hp-green: #32CD32;
+    --hp-bg: #222;
+    --mana-cyan: #00ffff;
+    --border-dark: #000;
+    --card-attack: #8b3a3a; /* Vermelho tijolo */
+    --card-defense: #3b5998; /* Azul cobalto */
+    --text-light: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'VT323', monospace;
+    user-select: none;
+}
+
+body {
+    background-color: #000;
+    color: var(--text-light);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    font-size: 1.5rem;
+    
+    /* Efeito crucial para 16-bits retro! */
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+#game-container {
+    width: 100vw;
+    height: 100vh;
+    max-width: 1280px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    
+    /* Cenário da Floresta */
+    background-image: url('./assets/images/forest_bg.jpg');
+    background-size: cover;
+    background-position: center bottom;
+    box-shadow: inset 0 0 150px rgba(0,0,0,0.8);
+    overflow: hidden;
+    
+    animation: ambient-breathe 10s infinite alternate ease-in-out;
+}
+
+@keyframes ambient-breathe {
+    0% { filter: brightness(1); }
+    100% { filter: brightness(0.7); }
+}
+
+/* Partículas de Folhas */
+.leaf {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background-color: #8da336;
+    box-shadow: 1px 1px 0 #3a4a19;
+    z-index: 0;
+    pointer-events: none;
+    animation: fall linear infinite;
+}
+
+@keyframes fall {
+    0% { top: -10%; transform: translateX(0) rotate(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { top: 110%; transform: translateX(50px) rotate(360deg); opacity: 0; }
+}
+
+/* --- Telas Adicionais --- */
+.screen {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+#start-screen, #end-screen, #loot-screen {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.95);
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 100;
+}
+
+#start-screen h1, #end-screen h1, #loot-screen h1 {
+    font-size: 5rem;
+    margin-bottom: 20px;
+    color: #f1c40f;
+    text-shadow: 4px 4px 0 #000;
+}
+
+/* CLASSE UTILITÁRIA JRPG BOX */
+.jrpg-box {
+    background-color: var(--jrpg-bg);
+    border: 4px solid var(--jrpg-border);
+    box-shadow: 0 0 0 4px var(--border-dark), inset 4px 4px 0 rgba(0,0,0,0.5);
+    color: var(--text-light);
+}
+
+.main-btn {
+    padding: 15px 40px;
+    font-size: 2rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: transform 0.1s;
+}
+
+.main-btn:active {
+    transform: translate(4px, 4px);
+}
+
+/* --- Battle Area --- */
+#floor-display {
+    text-align: center;
+    padding: 5px;
+    font-size: 2rem;
+    margin: 10px auto;
+    width: 200px;
+    letter-spacing: 4px;
+}
+
+#top-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 40px;
+}
+
+.entity-status {
+    width: 300px;
+    padding: 10px 15px;
+    position: relative;
+}
+
+.name {
+    font-size: 2rem;
+    margin-bottom: 5px;
+    display: block;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 0 #000;
+}
+
+/* HUD Vida Estilo Pokémon */
+.hp-bar-container {
+    width: 100%;
+    height: 25px;
+    background-color: var(--hp-bg);
+    border: 4px solid var(--border-dark);
+    position: relative;
+    box-shadow: 2px 2px 0 rgba(255,255,255,0.3);
+}
+
+.hp-bar {
+    height: 100%;
+    background-color: var(--hp-green); /* Verde Vida JRPG */
+    transition: width 0.3s steps(10); /* Movimento estilhaçado (steps) */
+}
+
+.hp-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.6rem;
+    text-shadow: 2px 2px 0 #000;
+    pointer-events: none;
+}
+
+.block-bubble {
+    display: inline-block;
+    background-color: #7f8c8d;
+    color: #fff;
+    padding: 2px 10px;
+    font-size: 1.6rem;
+    margin-top: 10px;
+    border: 4px solid var(--border-dark);
+}
+
+/* --- Sprites e Arena Central --- */
+#battle-area {
+    flex: 1;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    position: relative;
+    min-height: 0; 
+}
+
+.entity {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    justify-content: flex-end;
+    height: 250px;
+}
+
+/* Base de Grama/Pedra Estilo Pokémon sob o personagem */
+.entity::before {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    width: 280px; /* Aumentado para acompanhar o sprite */
+    height: 70px;
+    background-color: rgba(0, 0, 0, 0.4); /* Sombra oval solida e escura */
+    border-radius: 50%;
+    z-index: 1;
+}
+
+/* Sprites Finais Retro */
+.sprite {
+    width: 250px; /* Sprites maiores a pedido do usuario */
+    height: 250px;
+    z-index: 2;
+    transition: transform 0.2s;
+    /* Props para a imagem PNG */
+    background-size: contain;
+    background-position: bottom center;
+    background-repeat: no-repeat;
+    
+    /* Auto/smooth em vez de pixelated suaviza os serrilhados e bordas da IA */
+    image-rendering: auto; 
+    filter: drop-shadow(0 0 3px rgba(0,0,0,0.5)); /* Esconde imperfeicoes na borda */
+    
+    /* Animacao Idle simulando respiracao 16-bits */
+    animation: idle 1.5s infinite steps(2);
+}
+
+@keyframes idle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+}
+
+.enemy-sprite {
+    transform: scaleX(-1); 
+    animation: idleEnemy 1.5s infinite steps(2);
+}
+
+@keyframes idleEnemy {
+    0%, 100% { transform: scaleX(-1) translateY(0); }
+    50% { transform: scaleX(-1) translateY(-6px); }
+}
+
+/* Intenção */
+.intent-bubble {
+    padding: 5px 15px;
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    z-index: 3;
+    animation: float 2s infinite steps(4);
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+/* Botao Fim de Turno */
+#end-turn-btn {
+    position: absolute;
+    right: 40px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* --- Área Inferior --- */
+#bottom-bar {
+    height: 240px; 
+    flex-shrink: 0; 
+    display: flex;
+    align-items: center; 
+    padding: 10px 20px;
+    border-top: none; /* Substituido pela caixa JRPG */
+    margin: 10px;
+}
+
+/* Cristal de Mana (Energia) */
+#energy-bubble {
+    width: 80px;
+    height: 80px;
+    background: var(--mana-cyan);
+    border: 6px solid var(--border-dark);
+    /* Transformado em um Losango de Cristal */
+    transform: rotate(45deg);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-right: 40px;
+    margin-left: 20px;
+    box-shadow: inset -8px -8px 0 rgba(0,0,0,0.3), 6px 6px 0 rgba(0,0,0,0.8);
+}
+
+/* Desrotaciona o texto dentro do cristal */
+#energy-bubble-text-wrapper {
+    transform: rotate(-45deg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#energy-text {
+    font-size: 2.5rem;
+    text-shadow: 2px 2px 0 #000;
+    font-weight: bold;
+}
+
+#energy-bubble small {
+    font-size: 1rem;
+    text-shadow: 2px 2px 0 #000;
+}
+
+/* Mão e Cartas */
+#hand-container, #loot-cards-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Layout Interno Tatico das Cartas */
+.card {
+    width: 140px;
+    height: 190px;
+    border: 4px solid var(--border-dark);
+    border-radius: 0; /* Reto como SNES */
+    cursor: pointer;
+    display: grid;
+    grid-template-rows: 40px 60px 1fr;
+    grid-template-columns: 1fr;
+    box-shadow: 6px 6px 0 rgba(0,0,0,1);
+    transition: transform 0.1s, outline 0.1s;
+    background-color: #333;
+    position: relative;
+    color: #fff;
+}
+
+.card.image-card {
+    border-radius: 8px; /* Arredonda levemente pois o png original tem cantos assim */
+}
+
+.card.attack { background-color: var(--card-attack); }
+.card.defense { background-color: var(--card-defense); }
+
+.card:hover {
+    transform: translateY(-15px);
+    /* Borda seletora estilo Chrono Trigger */
+    outline: 4px solid #f1c40f; 
+    outline-offset: 2px;
+    z-index: 10;
+}
+
+.card.image-card:hover {
+    box-shadow: 0 0 15px #f1c40f;
+    outline: none; /* Remove outline quadrado das cartas de imagem */
+}
+
+/* Custo da carta agora é um quadrado duro */
+.card-cost {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    width: 40px;
+    height: 40px;
+    background-color: #fff;
+    color: #000;
+    border: 4px solid var(--border-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: bold;
+    box-shadow: 4px 4px 0 rgba(0,0,0,1);
+    z-index: 5;
+}
+
+.card-name {
+    grid-row: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    border-bottom: 4px solid var(--border-dark);
+    background-color: rgba(0,0,0,0.5);
+    text-shadow: 2px 2px 0 #000;
+}
+
+.card-image-placeholder {
+    grid-row: 2;
+    background: rgba(255,255,255,0.1);
+    border-bottom: 4px solid var(--border-dark);
+}
+
+.card-desc {
+    grid-row: 3;
+    padding: 5px;
+    font-size: 1.2rem;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.1;
+    text-shadow: 1px 1px 0 #000;
+}
+
+/* Pilhas */
+#deck-piles {
+    position: absolute;
+    right: 20px;
+    bottom: -15px; /* Sai um pouco da caixa inferior pra dar charme */
+    display: flex;
+    gap: 15px;
+}
+
+.pile {
+    width: 70px;
+    height: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+}
+
+.pile span { font-size: 2rem; color: #fff; text-shadow: 2px 2px 0 #000; }
+
+/* --- CLASSES DE EFEITO VIA JS --- */
+.anim-shake {
+    animation: shake 0.3s steps(4) both;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-10px); }
+    40%, 80% { transform: translateX(10px); }
+}
+
+.anim-flash {
+    animation: flash 0.3s steps(2);
+}
+
+@keyframes flash {
+    0% { filter: brightness(1) sepia(0); }
+    50% { filter: brightness(3) sepia(1) hue-rotate(180deg); } 
+    100% { filter: brightness(1) sepia(0); }
+}
+
+/* Potion Belt */
+.potion-belt {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.potion-slot {
+    width: 36px;
+    height: 36px;
+    border: 3px solid #666;
+    background-color: #1a1a1a;
+    border-radius: 4px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.8);
+    position: relative;
+    transition: transform 0.1s;
+}
+
+.potion-slot:hover {
+    transform: scale(1.1);
+    border-color: #fff;
+}
+
+.potion-icon {
+    font-size: 20px;
+    text-shadow: 1px 1px 0 #000;
+}
+.potion-tooltip {
+    display: none;
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #000;
+    color: #fff;
+    padding: 5px;
+    border: 1px solid #fff;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    z-index: 10;
+}
+.potion-slot:hover .potion-tooltip {
+    display: block;
+}

@@ -1,0 +1,24 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Diretórios e arquivos temporários / Logs
+logs
+*.log
+scratch/
+.env
+
+# Arquivos do sistema (Windows/Mac)
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Arquivos da IDE
+.vscode/
+.idea/
+
+# Outros
+coverage/
+dist/
+build/
